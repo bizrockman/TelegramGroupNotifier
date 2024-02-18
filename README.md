@@ -21,7 +21,7 @@ Before setting up TelegramGroupNotifier, ensure you have the following:
 
 1. **Clone the Repository:**
 
-git clone https://github.com/YourUsername/TelegramGroupNotifier.git
+git clone https://github.com/bizrockman/TelegramGroupNotifier.git
 
 2. **Install Dependencies:**
 
@@ -33,30 +33,22 @@ pip install -r requirements.txt
 
 Create a `.env` file in the project's root directory and define the following variables:
 
-SUPABASE_URL=Your_Supabase_URL
-SUPABASE_KEY=Your_Supabase_Key
-TELEGRAM_TOKEN=Your_Telegram_Bot_Token
+SUPABASE_URL=Your_Supabase_URL\
+SUPABASE_KEY=Your_Supabase_Key\
+TELEGRAM_TOKEN=Your_Telegram_Bot_Token\
 CHAT_ID=Your_Telegram_Chat_Id
-
 
 4. **Start the Bot:**
 
 python bot.py
 
-
 ## Usage
 
 After starting the bot, it will automatically monitor new entries in the `t_telegram_messages` table in your Supabase database and send messages according to the schedule set or immediately as new content appears.
-
-## Contributing
-
-Contributions are welcome! Please read `CONTRIBUTING.md` for details on our code of conduct and the contribution guidelines.
 
 ## License
 
 This project is licensed under the MIT License - see the `LICENSE` file for details.
 
-## Contact
 
-Your Name – @YourTwitterHandle – email@example.com
-Project Link: https://github.com/YourUsername/TelegramGroupNotifier
+Project Link: https://github.com/bizrockman/TelegramGroupNotifier
