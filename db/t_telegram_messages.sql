@@ -1,7 +1,7 @@
-create table
+reate table
   public.t_telegram_messages (
     id uuid not null default uuid_generate_v4 (),
-    topic character varying(255) null,
+    t_telegram_group_topic_id uuid null default gen_random_uuid (),
     content text null,
     media_content text null,
     media_url text null,
