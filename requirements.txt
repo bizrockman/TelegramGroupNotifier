@@ -2,3 +2,7 @@ python-dotenv
 python-telegram-bot[ext]
 supabase
 requests
+
+# Optional
+# Zotero Loader
+pyzotero
