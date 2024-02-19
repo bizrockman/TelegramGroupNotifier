@@ -38,7 +38,7 @@ def create_telegram_application() -> Application:
 def get_new_messages(supabase: Client):
     now = datetime.utcnow()
     # Fetch messages where 'schedule_for' is null or less than the current time, and 'sent_at' is null.
-    result = supabase.table('t_telegram_messages') \
+    result = supabase.table('v_telegram_messages_with_topics') \
         .select('*') \
         .or_('schedule_for.lte.{},schedule_for.is.null'.format(now.isoformat())) \
         .is_('sent_at', 'null') \
@@ -65,8 +65,8 @@ async def send_message(context: CallbackContext, chat_id: str, message: dict):
     parse_mode = 'HTML' if content and '<' in content and '>' in content else None
     media = await prepare_media(message)
 
-    topic = message.get('topic')
-    message_thread_id = get_message_thread_id_by_topic_name(supabase_client, topic)
+    message_thread_id = message.get('group_topic_id')
+    #message_thread_id = get_message_thread_id_by_topic_name(supabase_client, topic) # COmmeted because bad db design with string
 
     # TODO make it cleaner
     if message.get('media_type') == 'image' and content and media:
