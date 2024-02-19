@@ -46,6 +46,14 @@ python bot.py
 
 After starting the bot, it will automatically monitor new entries in the `t_telegram_messages` table in your Supabase database and send messages according to the schedule set or immediately as new content appears.
 
+## Loader
+
+This projects comes with a bunch of loader scripts to fill content into the message table.
+Right now they are completely independed. You can run a loader or use the bot framework itself.
+
+Loader included:
+- Zotero: fetching new entries from a Zotero collection and adding them to the message table. Based on a topic ID.
+
 ## License
 
 This project is licensed under the MIT License - see the `LICENSE` file for details.
