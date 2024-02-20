@@ -54,9 +54,11 @@ Right now they are completely independed. You can run a loader or use the bot fr
 Loader included:
 - Zotero: fetching new entries from a Zotero collection and adding them to the message table. Based on a topic ID.
 - Arxiv: fetching new entries from a Arxiv feed and adding them to the message table. Based on a category ID. Default limit 3 entries.
+- Github Trends: fetching new entries from the Github Trending page and adding them to the message table. Only top 5 per week right now.
+
 ## License
 
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+This project is licensed under the GPL v3 License - see the `LICENSE` file for details.
 
 
 Project Link: https://github.com/bizrockman/TelegramGroupNotifier
