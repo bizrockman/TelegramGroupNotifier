@@ -42,6 +42,7 @@ def get_new_messages(supabase: Client):
         .select('*') \
         .or_('schedule_for.lte.{},schedule_for.is.null'.format(now.isoformat())) \
         .is_('sent_at', 'null') \
+        .order('created_at') \
         .execute()
 
     return result.data
