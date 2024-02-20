@@ -6,9 +6,13 @@ feedparser
 
 # Optional
 openai
+apscheduler
 
 # Zotero Loader
 pyzotero
 
 # Arxiv Loader
 bs4
+
+# Github Loader
+lxml
