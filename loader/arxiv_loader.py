@@ -1,10 +1,9 @@
 from datetime import datetime, timezone, timedelta
 
 from dotenv import load_dotenv
-import utils.arxiv_helper as ah
-from utils import OpenAIHelper
-
-from loader_base import LoaderBase
+import loader.utils.arxiv_helper as ah
+from loader.utils import OpenAIHelper
+from loader.loader_base import LoaderBase
 
 
 class ArxivLoader(LoaderBase):
@@ -32,10 +31,7 @@ class ArxivLoader(LoaderBase):
 
         return system_msg
 
-    def load(self, default_category='cs.AI', limit=3, ai_summarize=True, ai_translate=True):
-        #TODO getting language from group information saved in the database
-        lang = 'de'
-
+    def retrieve(self, default_category='cs.AI', limit=3):
         # Get date from the latest message to the telegram table - using topic / reporter
         latest_message_date = self.get_latest_message_date().astimezone(timezone.utc)
         now = datetime.now(timezone.utc)
@@ -51,8 +47,13 @@ class ArxivLoader(LoaderBase):
 
         # Get everything what is new in the defined collection after that date
         entries = ah.do_today_search(default_category, limit)
-        #result['description'] = self.oih.gpt_35_response('In einem Satz auf Deutsch zusammenfassen.\n\n',
-        #                                                 result['description'])
+        return entries
+
+    def load(self, default_category='cs.AI', limit=3, ai_summarize=True, ai_translate=True):
+        # TODO getting language from group information saved in the database
+        lang = 'de'
+
+        entries = self.retrieve(default_category, limit)
         for entry in entries:
 
             if ai_translate or ai_summarize:
@@ -85,9 +86,7 @@ def main():
     arxiv_loader = ArxivLoader(telegram_group_topic_id=telegram_group_topic_id, template_file_name=template_file_name,
                                default_category='cs.AI')
 
-    messages = arxiv_loader.load(ai_summarize=True, ai_translate=True)
-    #for message in messages:
-    #    print(message)
+    arxiv_loader.load(ai_summarize=True, ai_translate=True)
 
 
 if __name__ == '__main__':

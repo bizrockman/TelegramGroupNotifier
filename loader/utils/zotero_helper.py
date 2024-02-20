@@ -20,27 +20,48 @@ class ZoteroHelper:
         else:
             return []
 
-    def get_latest_created_after_by_collection_name(self, date_str, collection_name, limit=5):
+    def get_latest_created_after_by_collection_name(self, date_str, collection_name, limit=5, all_types=False):
         collection_id = self.find_collection_by_path(collection_name)
         if collection_id:
-            return self.get_entries_created_after(date_str, collection_id, limit=limit)
+            return self.get_entries_created_after(date_str, collection_id, limit=limit, all_types=all_types)
         else:
             return []
 
-    def get_entries_created_after(self, date, collection_id, limit=5):
+    def get_all_collection_ids(self, collection_id):
+        """
+        Rekursive Funktion, um die IDs aller SubCollections einer Collection zu sammeln.
+        """
+        collection_ids = [collection_id]
+        subcollections = self.zotero_client.collections_sub(collection_id)
+        for subcollection in subcollections:
+            subcollection_id = subcollection['key']
+            collection_ids.extend(self.get_all_collection_ids(subcollection_id))
+        return collection_ids
+
+    def get_entries_created_after(self, date, collection_id, limit=5, all_types=False):
         date_filter = date.isoformat()
+        all_collection_ids = self.get_all_collection_ids(collection_id)
 
-        params = {
-            'itemType': '-attachment || note',
-            # Dies ist ein Beispiel und funktioniert möglicherweise nicht wie erwartet
-            'limit': limit,
-            'sort': 'dateAdded',
-            'direction': 'desc',
-        }
+        all_items = []
+        for cid in all_collection_ids:
+            params = {
+                'limit': limit,
+                'sort': 'dateAdded',
+                'direction': 'desc',
+            }
 
-        items = self.zotero_client.collection_items(collection_id, **params)
+            if not all_types:
+                params['itemType'] = '-attachment || note'
 
-        filtered_items = [item for item in items if item['data']['dateAdded'] > date_filter]
+            items = self.zotero_client.collection_items(cid, **params)
+            all_items.extend(items)
+
+        sorted_items = sorted(all_items, key=lambda x: x['data']['dateAdded'], reverse=True)
+
+        filtered_items = [item for item in sorted_items if item['data']['dateAdded'] > date_filter]
+
+        if limit is not None:
+            filtered_items = filtered_items[:limit]
 
         return filtered_items
 
