@@ -2,7 +2,13 @@ python-dotenv
 python-telegram-bot[ext]
 supabase
 requests
+feedparser
 
 # Optional
+openai
+
 # Zotero Loader
 pyzotero
+
+# Arxiv Loader
+bs4
