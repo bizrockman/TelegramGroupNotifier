@@ -4,6 +4,7 @@ from string import Template
 from datetime import datetime, timedelta
 
 from supabase import Client, create_client
+from loader.utils.telegram_helper import escape_html
 
 
 class LoaderBase:
@@ -49,13 +50,16 @@ class LoaderBase:
             return None
 
     def create_telegram_message(self, template_data):
+        template_data = {k: escape_html(v) for k, v in template_data.items()}
+
         with open(self.template_path, 'r', encoding='utf-8') as file:
             template_content = file.read()
 
         template = Template(template_content)
         return template.safe_substitute(template_data)
 
-    def save_telegram_message_to_supabase(self, message, schedule_for=None):
+    def save_telegram_message_to_supabase(self, message, media_url=None, media_type=None, media_content=None,
+                                          schedule_for=None):
         group_topic_uuid = self.find_group_topic_uuid()
         if not group_topic_uuid:
             print("Keine entsprechende group_topic_id gefunden.")
@@ -68,6 +72,13 @@ class LoaderBase:
             'creator': self.creator_name,
             'status': 'planned'
         }
+
+        if media_type and (media_url or media_content):
+            message_data['media_type'] = media_type
+            if media_url:
+                message_data['media_url'] = media_url
+            elif media_content:
+                message_data['media_content'] = media_content
 
         # Füge `schedule_for` hinzu, wenn ein Zeitpunkt angegeben ist
         if schedule_for:
