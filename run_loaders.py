@@ -3,11 +3,10 @@ import time
 
 from dotenv import load_dotenv
 
-from loader import ZoteroLoader, ArxivLoader, GitHubLoader
+from loader import ZoteroLoader, ArxivLoader, GitHubLoader, CivitaiLoader
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-from apscheduler.triggers.interval import IntervalTrigger
 
 
 def zotero_arxiv_loader_job():
@@ -46,6 +45,23 @@ def github_loader_job():
     github_loader.load()
 
 
+def civitas_image_loader_job():
+    telegram_group_topic_id = 27
+    template_file_name = 'civitas_loader_template.html'
+    civitai_image_loader = CivitaiLoader(telegram_group_topic_id=telegram_group_topic_id,
+                                         template_file_name=template_file_name)
+    civitai_image_loader.load()
+
+
+def civitas_video_loader_job():
+    telegram_group_topic_id = 28
+    template_file_name = 'civitas_loader_template.html'
+    civitai_video_loader = CivitaiLoader(telegram_group_topic_id=telegram_group_topic_id,
+                                         template_file_name=template_file_name,
+                                         media_type='video')
+    civitai_video_loader.load()
+
+
 def main():
     load_dotenv()
 
@@ -62,7 +78,9 @@ def main():
     scheduler.add_job(zotero_arxiv_loader_job, 'interval', hours=1, next_run_time=now)
     scheduler.add_job(zotero_github_loader_job, 'interval', hours=1, next_run_time=start_in_10_min)
     scheduler.add_job(zotero_prompts_loader_job, 'interval', hours=1, next_run_time=start_in_30_min)
-    scheduler.add_job(zotero_prompts_loader_job, 'interval', weeks=1, next_run_time=now)
+    scheduler.add_job(github_loader_job, 'interval', weeks=1, next_run_time=now)
+    scheduler.add_job(civitas_image_loader_job, 'interval', days=1, next_run_time=now)
+    scheduler.add_job(civitas_video_loader_job, 'interval', days=1, next_run_time=start_in_10_min)
     scheduler.start()
 
     try:
