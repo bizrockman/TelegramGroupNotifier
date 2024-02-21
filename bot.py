@@ -7,8 +7,10 @@ from io import BytesIO
 from datetime import datetime
 from dotenv import load_dotenv
 
-from telegram import Update
+from telegram import Update, ChatMember
 from telegram.ext import Application, ApplicationBuilder, ContextTypes, CommandHandler, CallbackContext
+from telegram.error import BadRequest
+
 from supabase import create_client, Client
 
 def setup_logging():
@@ -61,8 +63,8 @@ async def process_and_send_new_messages(context: CallbackContext):
 
 
 async def send_message(context: CallbackContext, chat_id: str, message: dict):
-    supabase_client: Client = context.job.data['supabase_client']
     content = message.get('content')
+
     parse_mode = 'HTML' if content and '<' in content and '>' in content else None
     media = await prepare_media(message)
 
@@ -70,21 +72,27 @@ async def send_message(context: CallbackContext, chat_id: str, message: dict):
     #message_thread_id = get_message_thread_id_by_topic_name(supabase_client, topic) # COmmeted because bad db design with string
 
     # TODO make it cleaner
+    message_object = None
+
     if message.get('media_type') == 'image' and content and media:
-        await context.bot.send_photo(chat_id=chat_id, photo=media, message_thread_id=message_thread_id,caption=content, parse_mode=parse_mode)
+        message_object = await context.bot.send_photo(chat_id=chat_id, photo=media, message_thread_id=message_thread_id,caption=content, parse_mode=parse_mode)
     elif message.get('media_type') == 'video' and content and media:
-        await context.bot.send_video(chat_id=chat_id, video=media, message_thread_id=message_thread_id,caption=content, parse_mode=parse_mode)
+        message_object = await context.bot.send_video(chat_id=chat_id, video=media, message_thread_id=message_thread_id,caption=content, parse_mode=parse_mode)
     elif message.get('media_type') == 'audio' and content and media:
-        await context.bot.send_audio(chat_id=chat_id, audio=media, message_thread_id=message_thread_id,caption=content, parse_mode=parse_mode)
+        message_object = await context.bot.send_audio(chat_id=chat_id, audio=media, message_thread_id=message_thread_id,caption=content, parse_mode=parse_mode)
     elif content:
-        await context.bot.send_message(chat_id=chat_id, message_thread_id=message_thread_id, text=content, parse_mode=parse_mode)
+        message_object = await context.bot.send_message(chat_id=chat_id, message_thread_id=message_thread_id, text=content, parse_mode=parse_mode)
     elif media:
         if message.get('media_type') == 'image':
-            await context.bot.send_photo(chat_id=chat_id, photo=media, message_thread_id=message_thread_id)
+            message_object = await context.bot.send_photo(chat_id=chat_id, photo=media, message_thread_id=message_thread_id)
         elif message.get('media_type') == 'video':
-            await context.bot.send_video(chat_id=chat_id, video=media, message_thread_id=message_thread_id)
+            message_object = await context.bot.send_video(chat_id=chat_id, video=media, message_thread_id=message_thread_id)
         elif message.get('media_type') == 'audio':
-            await context.bot.send_audio(chat_id=chat_id, audio=media, message_thread_id=message_thread_id)
+            message_object = await context.bot.send_audio(chat_id=chat_id, audio=media, message_thread_id=message_thread_id)
+
+    #TODO: Thinking about pinning the message
+    #if message_object:
+    #    await context.bot.pin_chat_message(chat_id=chat_id, message_id=message_object.message_id)
 
 
 def get_message_thread_id_by_topic_name(supabase: Client, topic_name: str):
