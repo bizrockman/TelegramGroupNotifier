@@ -55,6 +55,7 @@ Loader included:
 - Zotero: fetching new entries from a Zotero collection and adding them to the message table. Based on a topic ID.
 - Arxiv: fetching new entries from a Arxiv feed and adding them to the message table. Based on a category ID. Default limit 3 entries.
 - Github Trends: fetching new entries from the Github Trending page and adding them to the message table. Only top 5 per week right now.
+- CivitAI daily top image: Fetches the daily top image from CivitAI
 
 ## License
 
